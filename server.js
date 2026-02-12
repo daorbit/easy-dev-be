@@ -23,9 +23,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/easy-dev'
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
 const snippetsRoutes = require('./routes/snippets');
+const aiRoutes = require('./routes/ai');
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/snippets', snippetsRoutes);
+app.use('/api/ai', aiRoutes);
 
 const PORT = process.env.PORT || 5000;
 
