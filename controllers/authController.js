@@ -7,6 +7,15 @@ const generateToken = (id) => {
   });
 };
 
+const getUserIdFromToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    return decoded.id;
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+};
+
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -55,6 +64,25 @@ exports.signin = async (req, res) => {
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const userId = getUserIdFromToken(token);
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
