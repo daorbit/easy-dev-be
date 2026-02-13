@@ -16,6 +16,7 @@ app.use(
       "http://localhost:3000",
       "https://lovable.dev",
       "https://id-preview--5a0bbe0e-871f-4852-9707-824ccb4e39b5.lovable.app",
+      "https://lovable.dev/projects/5a0bbe0e-871f-4852-9707-824ccb4e39b5",
     ],
   }),
 );
