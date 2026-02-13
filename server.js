@@ -11,11 +11,10 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://svg-viewer-studio.vercel.app/",
+      "https://svg-viewer-studio.vercel.app",
       "http://localhost:8080",
       "http://localhost:3000",
       "https://lovable.dev",
-      "https://lovable.dev/projects/5a0bbe0e-871f-4852-9707-824ccb4e39b5",
       "https://id-preview--5a0bbe0e-871f-4852-9707-824ccb4e39b5.lovable.app",
     ],
   }),
