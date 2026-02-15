@@ -20,6 +20,11 @@ exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    // Check if required fields are provided
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Username, email, and password are required' });
+    }
+
     // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -44,6 +49,11 @@ exports.signup = async (req, res) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
+    console.error('Signup error:', error);
+    // Check if it's a database connection error
+    if (error.name === 'MongooseError' || error.message.includes('buffering timed out')) {
+      return res.status(503).json({ message: 'Database temporarily unavailable. Please try again later.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -51,6 +61,11 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
 
@@ -65,6 +80,11 @@ exports.signin = async (req, res) => {
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
+    console.error('Signin error:', error);
+    // Check if it's a database connection error
+    if (error.name === 'MongooseError' || error.message.includes('buffering timed out')) {
+      return res.status(503).json({ message: 'Database temporarily unavailable. Please try again later.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -84,6 +104,11 @@ exports.getMe = async (req, res) => {
 
     res.json(user);
   } catch (error) {
+    console.error('GetMe error:', error);
+    // Check if it's a database connection error
+    if (error.name === 'MongooseError' || error.message.includes('buffering timed out')) {
+      return res.status(503).json({ message: 'Database temporarily unavailable. Please try again later.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };

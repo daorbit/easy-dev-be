@@ -47,12 +47,6 @@ app.use("/api/converter", converterRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-if (require.main === module) {
-  // Only start the server if this file is run directly (not imported)
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-} else {
-  // Export the app for Vercel serverless functions
-  module.exports = app;
-}
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
