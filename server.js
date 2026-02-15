@@ -29,9 +29,13 @@ mongoose
   .connect(process.env.EASY_DEV_DB_MONGODB_URI || "mongodb://localhost:27017/easy-dev", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    bufferCommands: false, // Disable mongoose buffering
+    bufferMaxEntries: 0, // Disable mongoose buffering
   })
   .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log("MongoDB connection error:", err));
 
 // Routes
 const authRoutes = require("./routes/auth");
