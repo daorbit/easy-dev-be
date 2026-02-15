@@ -2,24 +2,10 @@ const multer = require('multer');
 const XLSX = require('xlsx');
 const PDFDocument = require('pdfkit');
 const path = require('path');
-const fs = require('fs');
 
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
+// Configure multer for file upload (memory storage for Vercel)
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-// Ensure uploads directory exists
-if (!fs.existsSync('uploads/')) {
-  fs.mkdirSync('uploads/');
-}
 
 // @desc    Convert Excel to PDF
 // @route   POST /api/converter/excel-to-pdf
@@ -29,20 +15,27 @@ const convertExcelToPdf = (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const inputPath = req.file.path;
-  const outputPath = inputPath.replace(path.extname(inputPath), '.pdf');
-
   try {
-    // Read Excel file
-    const workbook = XLSX.readFile(inputPath);
+    // Read Excel file from buffer
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // Create PDF
+    // Create PDF in memory
     const doc = new PDFDocument();
-    const stream = fs.createWriteStream(outputPath);
-    doc.pipe(stream);
+    const chunks = [];
+    const stream = require('stream');
+
+    // Collect PDF data in memory
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => {
+      const pdfBuffer = Buffer.concat(chunks);
+      // Send the PDF file
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="converted.pdf"');
+      res.send(pdfBuffer);
+    });
 
     // Add title
     doc.fontSize(18).text('Excel to PDF Conversion', { align: 'center' });
@@ -61,18 +54,6 @@ const convertExcelToPdf = (req, res) => {
     });
 
     doc.end();
-
-    stream.on('finish', () => {
-      // Send the PDF file
-      res.download(outputPath, 'converted.pdf', (err) => {
-        if (err) {
-          console.error('Download error:', err);
-        }
-        // Clean up files
-        fs.unlinkSync(inputPath);
-        fs.unlinkSync(outputPath);
-      });
-    });
 
   } catch (error) {
     console.error('Conversion error:', error);
