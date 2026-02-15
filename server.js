@@ -26,7 +26,7 @@ app.use(express.json());
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/easy-dev", {
+  .connect(process.env.EASY_DEV_DB_MONGODB_URI || "mongodb://localhost:27017/easy-dev", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
