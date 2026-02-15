@@ -13,6 +13,7 @@ app.use(
     origin: [
       "https://svg-viewer-studio.vercel.app",
       "https://easydev.daorbit.in",
+      "https://easydev.daorbit.in/",
       "http://localhost:8080",
       "http://localhost:3000",
       "https://lovable.dev",
